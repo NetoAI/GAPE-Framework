@@ -1,0 +1,40 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <http://netoai.ai/ontology/5g#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ---------------------------------------------------------
+# CLASS 3: STATE CONSISTENCY (Reference: Paper Sec 4.2.3)
+# ---------------------------------------------------------
+
+# Policy S-01: Ghost Node Prevention
+ex:ActiveNodeShape
+    a sh:NodeShape ;
+    sh:targetClass ex:NetworkFunction ;
+    sh:property [
+        sh:path ex:operationalState ;
+        sh:in ("ENABLED" "ACTIVE") ;
+        sh:message "Violation S-01: Action targets a decommissioned or suspended node." ;
+    ] .
+
+# ---------------------------------------------------------
+# CLASS 4: TEMPORAL CONSISTENCY (Reference: Paper Sec 4.2.4)
+# ---------------------------------------------------------
+
+# Policy T-01: Freshness Guardrail (SPARQL-based)
+ex:FreshnessShape
+    a sh:NodeShape ;
+    sh:targetClass ex:NetworkFunction ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Governance Failure: Telemetry too stale (>15s). Rejecting unsafe action." ;
+        sh:select """
+            PREFIX ex: <http://netoai.ai/ontology/5g#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            SELECT $this
+            WHERE {
+                $this ex:lastUpdated ?timestamp .
+                BIND(now() - ?timestamp AS ?age) .
+                FILTER(?age > "PT15S"^^xsd:duration)
+            }
+        """ ;
+    ] .

@@ -1,0 +1,52 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <http://netoai.ai/ontology/5g#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# ---------------------------------------------------------
+# CLASS 1: TOPOLOGICAL CONSTRAINTS (Reference: Paper Sec 4.2.1)
+# ---------------------------------------------------------
+
+# Policy T-01: AMF-UPF Isolation (The "N11" Constraint)
+ex:AMFUPFConstraint
+    a sh:NodeShape ;
+    sh:targetClass ex:AMFFunction ;
+    sh:property [
+        sh:path ex:connectedTo ;
+        sh:class ex:SMFFunction ;
+        sh:minCount 1 ;
+        sh:message "Violation T-01: AMF cannot connect directly to UPF. N11 traffic must be mediated by SMF." ;
+    ] ;
+    sh:property [
+        sh:path ex:connectedTo ;
+        sh:class ex:UPFFunction ;
+        sh:maxCount 0 ;
+        sh:message "Violation T-01: Direct AMF-UPF link detected. Protocol violation." ;
+    ] .
+
+# Policy T-02: gNB Dual Connectivity (Redundancy)
+ex:GNBRedundancy
+    a sh:NodeShape ;
+    sh:targetClass ex:GNBFunction ;
+    sh:property [
+        sh:path ex:connectedTo ;
+        sh:class ex:AMFFunction ;
+        sh:minCount 2 ;
+        sh:severity sh:Warning ;
+        sh:message "Warning T-02: gNB should have redundant AMF connections for high availability." ;
+    ] .
+
+# Policy T-03: Slice Subnet Constraints
+ex:SliceSubnetShape
+    a sh:NodeShape ;
+    sh:targetClass ex:NetworkSliceSubnet ;
+    sh:property [
+        sh:path ex:composedOf ;
+        sh:class ex:NetworkFunction ;
+        sh:minCount 3 ;
+        sh:message "Violation T-03: Invalid Slice Subnet. Must contain at least AMF, SMF, and UPF." ;
+    ] .
+
+# Note: This reference file demonstrates the verification logic for N11 and Subnet constraints.
+# The full commercial corpus (Policies T-04 to T-47) covering N2, N3, N4, and N6 interfaces 
+# follows this same structural pattern but is excluded from this open-source release.

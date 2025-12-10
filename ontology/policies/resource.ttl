@@ -1,0 +1,34 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <http://netoai.ai/ontology/5g#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ---------------------------------------------------------
+# CLASS 2: RESOURCE CONSTRAINTS (Reference: Paper Sec 4.2.2)
+# ---------------------------------------------------------
+
+# Policy R-01: Slice Bandwidth Cap
+ex:SliceCapacityShape
+    a sh:NodeShape ;
+    sh:targetClass ex:NetworkSlice ;
+    sh:property [
+        sh:path ex:allocatedBandwidth ;
+        sh:maxInclusive 1000 ; # 1 Gbps limit
+        sh:datatype xsd:integer ;
+        sh:message "Violation R-01: Slice bandwidth allocation exceeds physical constraints (1 Gbps)." ;
+    ] .
+
+# ---------------------------------------------------------
+# BLAST RADIUS CONTROL (Reference: Paper Sec 4.3)
+# ---------------------------------------------------------
+
+# Policy B-01: Delta Change Limiter
+# Prevents aggressive resizing that could cause starvation
+ex:BlastRadiusShape
+    a sh:NodeShape ;
+    sh:targetClass ex:NetworkSlice ;
+    sh:property [
+        sh:path ex:plannedCapacity ;
+        sh:maxInclusive 120 ; # +20% Cap
+        sh:minInclusive 80 ;  # -20% Floor
+        sh:message "Violation B-01: Blast Radius Exceeded. Capacity change >20% in single epoch is rejected." ;
+    ] .

@@ -10,11 +10,20 @@ This repository contains the reference implementation of the GAPE core logic and
 ## 🏗 Architecture
 GAPE is a neuro-symbolic framework that sandwiches a probabilistic agent (TSLAM-4B) between a deterministic Network Knowledge Graph (NKG) and SHACL-based policy validation.
 
-## 🚀 Reproducibility Guide
-To reproduce the results in **Table 1 (Safety Performance)**:
+## 🧪 Reproducing Experimental Results
+This repository includes the necessary artifacts to reproduce the ablation studies and safety benchmarks discussed in Section 5 of the paper.
 
-1. **Install Dependencies:**
+### Prerequisites
+* **Python 3.9+**
+* **Neo4j Database** (Community or Enterprise 5.x) running locally on `bolt://localhost:7687`.
+* **3GPP Schema**: Ensure your graph is populated with the base ontology.
+
+### Running the Safety Benchmark (Table 1)
+To validate the GAPE engine against the representative scenario set:
+
+1. **Configure the Environment**
    ```bash
    pip install -r requirements.txt
 
-
+2. **Run the Verification Suite** Execute the benchmark script which loads the SHACL policies and tests them against the synthetic scenarios defined in experiments/scenarios.json
+   python experiments/run_benchmark.py

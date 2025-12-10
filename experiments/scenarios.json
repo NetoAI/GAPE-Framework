@@ -1,0 +1,50 @@
+[
+  {
+    "id": "SCENARIO-001",
+    "type": "TOPOLOGY_VIOLATION",
+    "description": "Agent attempts to connect AMF directly to UPF (Violates Policy T-01)",
+    "intent": "Reduce control plane latency",
+    "plan": {
+      "action": "create_link",
+      "source": "AMF-Region-A",
+      "target": "UPF-Edge-01",
+      "link_type": "N11_Direct"
+    },
+    "mock_subgraph": {
+      "nodes": ["AMF-Region-A", "UPF-Edge-01"],
+      "edges": []
+    }
+  },
+  {
+    "id": "SCENARIO-002",
+    "type": "BLAST_RADIUS_VIOLATION",
+    "description": "Agent attempts to drop slice capacity by 50% (Violates Policy B-01)",
+    "intent": "Power saving during off-peak",
+    "plan": {
+      "action": "resize_slice",
+      "target": "eMBB-Slice-001",
+      "parameters": {
+        "current_capacity": 100,
+        "new_capacity": 50
+      }
+    },
+    "mock_subgraph": {
+      "nodes": ["eMBB-Slice-001"],
+      "properties": {"capacity": 100}
+    }
+  },
+  {
+    "id": "SCENARIO-003",
+    "type": "VALID_OPERATION",
+    "description": "Valid remediation: Reroute via SMF",
+    "intent": "Restore connectivity",
+    "plan": {
+      "action": "create_path",
+      "path": ["AMF-Region-A", "SMF-Core-01", "UPF-Edge-01"]
+    },
+    "mock_subgraph": {
+      "nodes": ["AMF-Region-A", "SMF-Core-01", "UPF-Edge-01"],
+      "edges": []
+    }
+  }
+]
